@@ -19,18 +19,22 @@
       }
     </script>
     <script>
-      // Polyfill for process.env to allow API key from URL parameter
+      // Polyfill for process.env and inject API key from server
       if (!window.process) {
         window.process = { env: {} };
       }
       
+      // Try to get API key from URL parameter first
       const urlParams = new URLSearchParams(window.location.search);
-      const apiKey = urlParams.get('API_KEY') || urlParams.get('GEMINI_API_KEY');
+      const urlApiKey = urlParams.get('API_KEY') || urlParams.get('GEMINI_API_KEY');
       
-      if (apiKey) {
-        window.process.env.API_KEY = apiKey;
-        window.process.env.GEMINI_API_KEY = apiKey;
+      if (urlApiKey) {
+        window.process.env.API_KEY = urlApiKey;
+        window.process.env.GEMINI_API_KEY = urlApiKey;
       }
+      
+      // Also check for server-injected environment variables
+      window.process.env.VITE_GEMINI_API_KEY = '{{GEMINI_API_KEY}}';
     </script>
   </head>
   <body>
