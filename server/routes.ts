@@ -6,7 +6,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API configuration endpoint
   app.get("/api/config", (req, res) => {
     res.json({
-      geminiApiKey: process.env.GEMINI_API_KEY || null
+      geminiApiKey: process.env.GEMINI_API_KEY || null,
+      openaiApiKey: process.env.OPENAI_API_KEY || null
     });
   });
 

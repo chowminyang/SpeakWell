@@ -8,7 +8,7 @@ import { Mic, MicOff, Languages } from 'lucide-react';
 import { LanguageCode } from '../types';
 import { LANGUAGE_CONFIG } from '../constants';
 import { useAudioRecording } from '../hooks/useAudioRecording';
-import { transcribeAudioWithGemini, translateTextToEnglish } from '../services/geminiService';
+import { transcribeAudioWithOpenAI, translateTextToEnglish } from '../services/openaiService';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserInputProps {
@@ -48,45 +48,36 @@ export default function UserInput({
         if (audioBlob) {
           setIsTranscribing(true);
           
-          // Convert blob to base64
-          const reader = new FileReader();
-          reader.onload = async () => {
-            try {
-              const base64Audio = (reader.result as string).split(',')[1];
-              const mimeType = audioBlob.type || 'audio/webm;codecs=opus';
-              
-              // Transcribe audio
-              const transcription = await transcribeAudioWithGemini(
-                selectedLanguage,
-                base64Audio,
-                mimeType
-              );
-              
-              // Update user attempt with transcription
-              onUserAttemptChange(transcription);
-              
-              // Translate to English for verification
-              if (transcription.trim()) {
-                const translation = await translateTextToEnglish(selectedLanguage, transcription);
-                onSpeechTranslationChange(translation);
-              }
-              
-              toast({
-                title: "Audio Transcribed",
-                description: "Your speech has been converted to text.",
-              });
-              
-            } catch (error) {
-              toast({
-                title: "Transcription Error",
-                description: error instanceof Error ? error.message : "Failed to transcribe audio",
-                variant: "destructive",
-              });
-            } finally {
-              setIsTranscribing(false);
+          try {
+            // Transcribe audio directly with OpenAI Whisper
+            const transcription = await transcribeAudioWithOpenAI(
+              selectedLanguage,
+              audioBlob
+            );
+            
+            // Update user attempt with transcription
+            onUserAttemptChange(transcription);
+            
+            // Translate to English for verification
+            if (transcription.trim()) {
+              const translation = await translateTextToEnglish(selectedLanguage, transcription);
+              onSpeechTranslationChange(translation);
             }
-          };
-          reader.readAsDataURL(audioBlob);
+            
+            toast({
+              title: "Audio Transcribed",
+              description: "Your speech has been converted to text using OpenAI Whisper.",
+            });
+            
+          } catch (error) {
+            toast({
+              title: "Transcription Error",
+              description: error instanceof Error ? error.message : "Failed to transcribe audio",
+              variant: "destructive",
+            });
+          } finally {
+            setIsTranscribing(false);
+          }
         }
       } catch (error) {
         toast({

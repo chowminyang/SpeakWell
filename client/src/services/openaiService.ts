@@ -1,0 +1,205 @@
+import OpenAI from 'openai';
+import { 
+  LanguageCode, 
+  DifficultyLevel, 
+  AIParsedResponse, 
+  Scenario 
+} from '../types';
+import { 
+  LANGUAGE_CONFIG,
+  SCENARIO_GENERATION_PROMPT_TEMPLATE,
+  EVALUATION_PROMPT_TEMPLATE,
+  TRANSLATION_PROMPT_TEMPLATE
+} from '../constants';
+
+// API Key handling
+async function getApiKey(): Promise<string> {
+  // First try URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlApiKey = urlParams.get('OPENAI_API_KEY') || urlParams.get('API_KEY');
+  
+  if (urlApiKey) {
+    return urlApiKey;
+  }
+  
+  // Then try to fetch from server
+  try {
+    const response = await fetch('/api/config');
+    const config = await response.json();
+    if (config.openaiApiKey) {
+      return config.openaiApiKey;
+    }
+  } catch (error) {
+    console.log('Could not fetch OpenAI API key from server');
+  }
+  
+  throw new Error('OpenAI API key is missing. Please provide a valid API key.');
+}
+
+// Initialize OpenAI
+let openai: OpenAI;
+
+async function initializeOpenAI() {
+  if (!openai) {
+    const apiKey = await getApiKey();
+    openai = new OpenAI({ 
+      apiKey,
+      dangerouslyAllowBrowser: true 
+    });
+  }
+  return openai;
+}
+
+// Core service functions
+export async function generateNewScenario(
+  languageCode: LanguageCode,
+  difficulty: DifficultyLevel,
+  previousScenarios: string[] = []
+): Promise<Scenario> {
+  try {
+    const client = await initializeOpenAI();
+    
+    const languageConfig = LANGUAGE_CONFIG[languageCode];
+    const prompt = SCENARIO_GENERATION_PROMPT_TEMPLATE(
+      languageConfig.name,
+      difficulty,
+      previousScenarios
+    );
+    
+    console.log('Generating scenario with OpenAI GPT-4o:', prompt);
+    
+    const response = await client.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 150,
+      temperature: 0.7
+    });
+    
+    const text = response.choices[0].message.content?.trim() || '';
+    
+    console.log('Generated scenario:', text);
+    
+    return {
+      englishText: text,
+      difficulty,
+      language: languageCode
+    };
+  } catch (error) {
+    console.error('Error generating scenario:', error);
+    throw new Error('Failed to generate new scenario. Please check your internet connection and try again.');
+  }
+}
+
+export async function evaluateAndSuggest(
+  languageCode: LanguageCode,
+  englishScenario: string,
+  userAttempt: string
+): Promise<AIParsedResponse> {
+  try {
+    const client = await initializeOpenAI();
+    
+    const languageConfig = LANGUAGE_CONFIG[languageCode];
+    const prompt = EVALUATION_PROMPT_TEMPLATE(languageConfig, englishScenario, userAttempt);
+    
+    console.log('Evaluating with OpenAI GPT-4o:', prompt);
+    
+    const response = await client.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      max_tokens: 500,
+      temperature: 0.3
+    });
+    
+    const text = response.choices[0].message.content || '';
+    
+    console.log('Raw evaluation response:', text);
+    
+    const parsedResponse = JSON.parse(text);
+    
+    // Validate response structure
+    if (!parsedResponse.attemptScore || !parsedResponse.feedback || !parsedResponse.modelAnswer) {
+      throw new Error('Invalid response structure from AI evaluation');
+    }
+    
+    // Ensure attemptScore is within valid range
+    if (parsedResponse.attemptScore < 0 || parsedResponse.attemptScore > 5) {
+      parsedResponse.attemptScore = Math.max(0, Math.min(5, parsedResponse.attemptScore));
+    }
+    
+    return parsedResponse as AIParsedResponse;
+  } catch (error) {
+    console.error('Error evaluating attempt:', error);
+    throw new Error('Failed to evaluate your attempt. Please try again.');
+  }
+}
+
+export async function translateTextToEnglish(
+  languageCode: LanguageCode,
+  textToTranslate: string
+): Promise<string> {
+  try {
+    const client = await initializeOpenAI();
+    
+    const languageConfig = LANGUAGE_CONFIG[languageCode];
+    const prompt = TRANSLATION_PROMPT_TEMPLATE(languageConfig, textToTranslate);
+    
+    console.log('Translating text with OpenAI:', textToTranslate);
+    
+    const response = await client.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 200,
+      temperature: 0.1
+    });
+    
+    const translation = response.choices[0].message.content?.trim() || '';
+    
+    console.log('Translation result:', translation);
+    
+    return translation;
+  } catch (error) {
+    console.error('Error translating text:', error);
+    throw new Error('Failed to translate text. Please try again.');
+  }
+}
+
+export async function transcribeAudioWithOpenAI(
+  languageCode: LanguageCode,
+  audioBlob: Blob
+): Promise<string> {
+  try {
+    console.log('Starting transcription with OpenAI Whisper:', {
+      languageCode,
+      audioBlobSize: audioBlob.size,
+      audioBlobType: audioBlob.type
+    });
+    
+    const client = await initializeOpenAI();
+    
+    const languageConfig = LANGUAGE_CONFIG[languageCode];
+    
+    // Create a File object from the Blob for OpenAI API
+    const audioFile = new File([audioBlob], 'audio.webm', { type: audioBlob.type });
+    
+    console.log('Transcribing audio with Whisper in:', languageConfig.name);
+    
+    const transcription = await client.audio.transcriptions.create({
+      file: audioFile,
+      model: 'whisper-1',
+      language: languageCode === 'zh' ? 'zh' : 'ms',
+      response_format: 'text'
+    });
+    
+    console.log('Whisper transcription result:', transcription);
+    
+    return transcription.trim();
+  } catch (error) {
+    console.error('Detailed transcription error:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    throw new Error(`Failed to transcribe audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}

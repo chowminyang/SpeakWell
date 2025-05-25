@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserCircle, Trophy, Star, Globe, Leaf, Flame, Lock } from 'lucide-react';
 import { LanguageCode, PlayerStats, Scenario, DifficultyLevel, EvaluationResult } from '../types';
 import { LANGUAGE_CONFIG, DIFFICULTY_UNLOCK_LEVELS, XP_PER_LEVEL_INCREASE, SCORE_MULTIPLIER, XP_MULTIPLIER, INITIAL_SCENARIOS } from '../constants';
-import { generateNewScenario, evaluateAndSuggest } from '../services/geminiService';
+import { generateNewScenario, evaluateAndSuggest } from '../services/openaiService';
 import ScenarioDisplay from './ScenarioDisplay';
 import UserInput from './UserInput';
 import FeedbackDisplay from './FeedbackDisplay';
