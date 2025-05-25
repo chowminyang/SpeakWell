@@ -11,18 +11,18 @@ interface ScenarioDisplayProps {
 
 export default function ScenarioDisplay({ scenario, onTryAnother, disabled }: ScenarioDisplayProps) {
   return (
-    <Card className="mb-8">
-      <CardContent className="p-6">
-        <div className="flex items-start space-x-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <ClipboardList className="text-blue-600" size={20} />
+    <Card className="mb-4 sm:mb-8">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex items-start space-x-2 sm:space-x-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <ClipboardList className="text-blue-600" size={16} />
           </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-2">
               Current Scenario
             </h3>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <p className="text-slate-700 leading-relaxed">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+              <p className="text-sm sm:text-base text-slate-700 leading-relaxed">
                 {scenario.englishText}
               </p>
             </div>

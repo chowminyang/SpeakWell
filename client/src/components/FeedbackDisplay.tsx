@@ -116,8 +116,8 @@ export default function FeedbackDisplay({
   };
 
   return (
-    <Card className="mb-8">
-      <CardContent className="p-6">
+    <Card className="mb-4 sm:mb-8">
+      <CardContent className="p-4 sm:p-6">
         <h3 className="text-lg font-semibold text-slate-800 mb-6">AI Feedback</h3>
 
         {/* Score Rating */}

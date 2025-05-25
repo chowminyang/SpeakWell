@@ -125,8 +125,8 @@ export default function UserInput({
           </div>
 
           {/* Recording Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-t border-slate-200 pt-4">
-            <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+          <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 border-t border-slate-200 pt-3 sm:pt-4">
+            <div className="flex items-center justify-center sm:justify-start space-x-3 sm:space-x-4">
               {/* Record Button */}
               <Button
                 type="button"
@@ -134,19 +134,19 @@ export default function UserInput({
                 size="sm"
                 onClick={handleToggleRecording}
                 disabled={disabled || isTranscribing}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 px-3 py-2"
               >
                 {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                <span>
-                  {isRecording ? 'Stop Recording' : isTranscribing ? 'Transcribing...' : 'Record'}
+                <span className="text-sm">
+                  {isRecording ? 'Stop' : isTranscribing ? 'Processing...' : 'Record'}
                 </span>
               </Button>
 
               {/* Recording Status */}
               {isRecording && (
                 <div className="flex items-center space-x-2 text-red-600">
-                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium">Recording...</span>
+                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs sm:text-sm font-medium">Recording...</span>
                 </div>
               )}
             </div>
@@ -155,7 +155,7 @@ export default function UserInput({
             <Button 
               type="submit"
               disabled={disabled || !userAttempt.trim() || isRecording || isTranscribing}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto px-6 py-2"
             >
               {disabled ? 'Evaluating...' : 'Submit Attempt'}
             </Button>
