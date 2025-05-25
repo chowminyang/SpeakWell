@@ -104,7 +104,4 @@ export const TRANSCRIPTION_PROMPT_TEMPLATE = (
   languageConfig: LanguageConfig
 ) => `Transcribe this audio to text. The audio is in ${languageConfig.name}. Provide only the transcribed text, no additional formatting or explanation.`;
 
-export const INITIAL_SCENARIOS = {
-  zh: "Inform the patient they have a common cold and should rest for 2-3 days while drinking plenty of fluids.",
-  ms: "Tell the patient their blood pressure is slightly elevated and they should reduce salt intake."
-};
+

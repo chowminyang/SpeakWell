@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserCircle, Trophy, Star, Globe, Leaf, Flame, Lock } from 'lucide-react';
 import { LanguageCode, PlayerStats, Scenario, DifficultyLevel, EvaluationResult } from '../types';
-import { LANGUAGE_CONFIG, DIFFICULTY_UNLOCK_LEVELS, XP_PER_LEVEL_INCREASE, SCORE_MULTIPLIER, XP_MULTIPLIER, INITIAL_SCENARIOS } from '../constants';
+import { LANGUAGE_CONFIG, DIFFICULTY_UNLOCK_LEVELS, XP_PER_LEVEL_INCREASE, SCORE_MULTIPLIER, XP_MULTIPLIER } from '../constants';
 import { generateNewScenario, evaluateAndSuggest } from '../services/openaiService';
 import ScenarioDisplay from './ScenarioDisplay';
 import UserInput from './UserInput';
@@ -57,18 +57,9 @@ export default function MainPracticeScreen({
   const generateInitialScenario = useCallback(async () => {
     setIsGenerating(true);
     try {
-      // Use initial scenario if no previous scenarios exist
-      if (previousScenarios.length === 0) {
-        const initialScenario: Scenario = {
-          englishText: INITIAL_SCENARIOS[selectedLanguage],
-          difficulty: 'Easy',
-          language: selectedLanguage
-        };
-        onUpdateScenario(initialScenario);
-      } else {
-        const scenario = await generateNewScenario(selectedLanguage, chosenDifficulty, previousScenarios);
-        onUpdateScenario(scenario);
-      }
+      // Always generate new scenario with AI, no placeholders
+      const scenario = await generateNewScenario(selectedLanguage, chosenDifficulty, previousScenarios);
+      onUpdateScenario(scenario);
     } catch (error) {
       toast({
         title: "Error",
