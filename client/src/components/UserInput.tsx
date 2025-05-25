@@ -119,7 +119,7 @@ export default function UserInput({
               onChange={(e) => onUserAttemptChange(e.target.value)}
               placeholder="Enter your response here..."
               rows={4}
-              className="resize-none"
+              className="resize-none text-base sm:text-lg"
               disabled={disabled || isTranscribing}
             />
           </div>
