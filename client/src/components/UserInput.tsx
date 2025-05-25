@@ -102,11 +102,11 @@ export default function UserInput({
   }, [onSubmit]);
 
   return (
-    <Card className="mb-8">
-      <CardContent className="p-6">
-        <h3 className="text-lg font-semibold text-slate-800 mb-4">Your Response</h3>
+    <Card className="mb-4 sm:mb-8">
+      <CardContent className="p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Your Response</h3>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {/* Text Input */}
           <div className="space-y-2">
             <Label htmlFor="user-response" className="text-sm font-medium text-slate-700">

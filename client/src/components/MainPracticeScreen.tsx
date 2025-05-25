@@ -201,50 +201,47 @@ export default function MainPracticeScreen({
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo and Title */}
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3">
-                <UserCircle className="text-primary-foreground" size={24} />
+            <div className="flex items-center min-w-0 flex-1">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
+                <UserCircle className="text-primary-foreground" size={20} />
               </div>
-              <div>
-                <h1 className="text-lg font-semibold text-slate-800">
+              <div className="min-w-0">
+                <h1 className="text-sm sm:text-lg font-semibold text-slate-800 truncate">
                   {languageConfig.displayName} Practice
                 </h1>
-                <p className="text-xs text-slate-500">Medical Communication</p>
+                <p className="text-xs text-slate-500 hidden sm:block">Medical Communication</p>
               </div>
             </div>
 
             {/* Player Stats */}
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Level Badge */}
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+              <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-xs px-2 py-1">
                 <Star className="w-3 h-3 mr-1" />
-                Level {playerStats.level}
+                L{playerStats.level}
               </Badge>
 
               {/* Score */}
               <div className="flex items-center">
-                <Trophy className="w-4 h-4 text-yellow-500 mr-2" />
-                <span className="text-sm font-medium text-slate-700">
-                  {playerStats.score.toLocaleString()} pts
+                <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 mr-1" />
+                <span className="text-xs sm:text-sm font-medium text-slate-700">
+                  {playerStats.score > 999 ? `${Math.floor(playerStats.score/1000)}k` : playerStats.score}
                 </span>
               </div>
 
               {/* XP Progress */}
-              <div className="hidden sm:flex items-center space-x-3">
-                <span className="text-sm text-slate-600">XP</span>
-                <div className="w-24">
-                  <Progress value={xpProgress} className="h-2" />
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <span className="text-xs sm:text-sm text-slate-600">XP</span>
+                <div className="w-12 sm:w-20">
+                  <Progress value={xpProgress} className="h-1.5 sm:h-2" />
                 </div>
-                <span className="text-xs text-slate-500">
-                  {playerStats.xp}/{playerStats.xpToNext}
-                </span>
               </div>
 
               {/* Change Language Button */}
-              <Button variant="ghost" size="sm" onClick={onChangeLanguage}>
+              <Button variant="ghost" size="sm" onClick={onChangeLanguage} className="p-1 sm:p-2">
                 <Globe className="w-4 h-4" />
               </Button>
             </div>
@@ -253,10 +250,10 @@ export default function MainPracticeScreen({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Difficulty Selector */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
+        <Card className="mb-4 sm:mb-8">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="mb-4 sm:mb-0">
                 <h2 className="text-lg font-semibold text-slate-800 mb-1">
@@ -265,7 +262,7 @@ export default function MainPracticeScreen({
                 <p className="text-sm text-slate-600">Choose your challenge level</p>
               </div>
 
-              <div className="flex space-x-2">
+              <div className="grid grid-cols-3 gap-2 sm:flex sm:space-x-2 sm:gap-0">
                 {(['Easy', 'Medium', 'Hard'] as DifficultyLevel[]).map((difficulty) => (
                   <Button
                     key={difficulty}
@@ -273,14 +270,18 @@ export default function MainPracticeScreen({
                     size="sm"
                     onClick={() => handleDifficultyChange(difficulty)}
                     disabled={!isDifficultyUnlocked(difficulty)}
-                    className={`${getDifficultyColor(difficulty)} ${chosenDifficulty === difficulty ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
+                    className={`flex items-center justify-center text-xs sm:text-sm px-2 py-2 ${getDifficultyColor(difficulty)} ${chosenDifficulty === difficulty ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
                   >
-                    {getDifficultyIcon(difficulty)}
-                    <span className="ml-1">
+                    <span className="w-4 h-4 mr-1 sm:mr-2">{getDifficultyIcon(difficulty)}</span>
+                    <span className="hidden sm:inline">
                       {difficulty}
                       {!isDifficultyUnlocked(difficulty) && 
-                        ` (Level ${DIFFICULTY_UNLOCK_LEVELS[difficulty]} Req.)`
+                        ` (L${DIFFICULTY_UNLOCK_LEVELS[difficulty]})`
                       }
+                    </span>
+                    <span className="sm:hidden">
+                      {difficulty.charAt(0)}
+                      {!isDifficultyUnlocked(difficulty) && <Lock className="w-3 h-3 ml-1" />}
                     </span>
                   </Button>
                 ))}
