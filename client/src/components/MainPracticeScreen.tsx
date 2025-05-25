@@ -303,6 +303,25 @@ export default function MainPracticeScreen({
           <ScenarioDisplay scenario={currentScenario} />
         )}
 
+        {/* Try Another Scenario Button */}
+        {currentScenario && !isGenerating && !evaluationResult && (
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={handleNextScenario}
+                  disabled={isEvaluating}
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  Try Another Scenario
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* User Input */}
         {currentScenario && !isGenerating && (
           <UserInput
