@@ -1,0 +1,5 @@
+{
+  "name": "Medical Communication Practice (Mandarin & Malay)",
+  "description": "Practice medical communication skills in Simplified Mandarin Chinese and Bahasa Melayu with AI-powered scenarios, speech recognition, and personalized feedback.",
+  "requestedPermissions": ["microphone"]
+}
