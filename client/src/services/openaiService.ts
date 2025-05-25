@@ -66,10 +66,10 @@ export async function generateNewScenario(
       previousScenarios
     );
     
-    console.log('Generating scenario with OpenAI GPT-4o:', prompt);
+    console.log('Generating scenario with OpenAI GPT-4o-mini:', prompt);
     
     const response = await client.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      model: "gpt-4o-mini", // Using gpt-4o-mini for cost efficiency while maintaining high quality
       messages: [{ role: "user", content: prompt }],
       max_tokens: 150,
       temperature: 0.7
@@ -101,10 +101,10 @@ export async function evaluateAndSuggest(
     const languageConfig = LANGUAGE_CONFIG[languageCode];
     const prompt = EVALUATION_PROMPT_TEMPLATE(languageConfig, englishScenario, userAttempt);
     
-    console.log('Evaluating with OpenAI GPT-4o:', prompt);
+    console.log('Evaluating with OpenAI GPT-4o-mini:', prompt);
     
     const response = await client.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      model: "gpt-4o-mini", // Using gpt-4o-mini for cost efficiency while maintaining high quality
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
       max_tokens: 500,
@@ -147,7 +147,7 @@ export async function translateTextToEnglish(
     console.log('Translating text with OpenAI:', textToTranslate);
     
     const response = await client.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      model: "gpt-4o-mini", // Using gpt-4o-mini for cost efficiency while maintaining high quality
       messages: [{ role: "user", content: prompt }],
       max_tokens: 200,
       temperature: 0.1
