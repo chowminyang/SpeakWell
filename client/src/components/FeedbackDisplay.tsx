@@ -5,6 +5,7 @@ import { Star, StarHalf, Play, Pause, RotateCcw, ArrowRight } from 'lucide-react
 import { EvaluationResult, LanguageCode } from '../types';
 import { LANGUAGE_CONFIG } from '../constants';
 import { useToast } from '@/hooks/use-toast';
+import { generateSpeechWithOpenAI } from '../services/openaiService';
 
 interface FeedbackDisplayProps {
   evaluationResult: EvaluationResult;
@@ -21,6 +22,7 @@ export default function FeedbackDisplay({
 }: FeedbackDisplayProps) {
   const { toast } = useToast();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const languageConfig = LANGUAGE_CONFIG[selectedLanguage];
 
   const renderStars = (score: number) => {
@@ -45,53 +47,53 @@ export default function FeedbackDisplay({
   };
 
   const handlePlayTTS = async () => {
-    if (!('speechSynthesis' in window)) {
-      toast({
-        title: "TTS Not Supported",
-        description: "Text-to-speech is not supported in your browser.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (isPlaying) {
-      speechSynthesis.cancel();
+      // Stop current audio
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        setCurrentAudio(null);
+      }
       setIsPlaying(false);
       return;
     }
 
     try {
-      // For Chinese, remove Pinyin in parentheses for TTS
-      let textToSpeak = evaluationResult.modelAnswer;
-      if (selectedLanguage === 'zh') {
-        // Remove Pinyin in parentheses like (Nǐ hǎo)
-        textToSpeak = textToSpeak.replace(/\s*\([^)]*\)/g, '');
-      }
+      setIsPlaying(true);
       
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      utterance.lang = languageConfig.ttsCode;
-      utterance.rate = 0.8;
+      // Generate speech with OpenAI TTS
+      const audioBlob = await generateSpeechWithOpenAI(evaluationResult.modelAnswer, selectedLanguage);
       
-      // Add a small delay to prevent audio cutoff
-      setTimeout(() => {
-        utterance.onstart = () => setIsPlaying(true);
-        utterance.onend = () => setIsPlaying(false);
-        utterance.onerror = () => {
-          setIsPlaying(false);
-          toast({
-            title: "TTS Error",
-            description: "Failed to play text-to-speech. Voice might not be available for this language.",
-            variant: "destructive",
-          });
-        };
-
-        speechSynthesis.speak(utterance);
-      }, 100);
+      // Create audio element and play
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        setIsPlaying(false);
+        setCurrentAudio(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.onerror = () => {
+        setIsPlaying(false);
+        setCurrentAudio(null);
+        URL.revokeObjectURL(audioUrl);
+        toast({
+          title: "Audio Error",
+          description: "Failed to play generated audio.",
+          variant: "destructive",
+        });
+      };
+      
+      setCurrentAudio(audio);
+      await audio.play();
+      
     } catch (error) {
       setIsPlaying(false);
+      setCurrentAudio(null);
       toast({
         title: "TTS Error",
-        description: "Failed to initialize text-to-speech.",
+        description: error instanceof Error ? error.message : "Failed to generate speech.",
         variant: "destructive",
       });
     }

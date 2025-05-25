@@ -203,3 +203,36 @@ export async function transcribeAudioWithOpenAI(
     throw new Error(`Failed to transcribe audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+export async function generateSpeechWithOpenAI(
+  text: string,
+  languageCode: LanguageCode
+): Promise<Blob> {
+  try {
+    const client = await initializeOpenAI();
+    
+    // Remove Pinyin in parentheses for Chinese TTS
+    let textToSpeak = text;
+    if (languageCode === 'zh') {
+      textToSpeak = textToSpeak.replace(/\s*\([^)]*\)/g, '');
+    }
+    
+    console.log('Generating speech with OpenAI TTS:', textToSpeak);
+    
+    const response = await client.audio.speech.create({
+      model: 'tts-1', // Using OpenAI's TTS model
+      voice: 'alloy', // Good quality voice that works well with multiple languages
+      input: textToSpeak,
+      response_format: 'mp3'
+    });
+    
+    const audioBlob = new Blob([await response.arrayBuffer()], { type: 'audio/mp3' });
+    
+    console.log('Generated audio blob size:', audioBlob.size);
+    
+    return audioBlob;
+  } catch (error) {
+    console.error('Error generating speech:', error);
+    throw new Error('Failed to generate speech. Please try again.');
+  }
+}
