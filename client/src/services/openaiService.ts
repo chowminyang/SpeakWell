@@ -182,13 +182,12 @@ export async function transcribeAudioWithOpenAI(
     // Create a File object from the Blob for OpenAI API
     const audioFile = new File([audioBlob], 'audio.webm', { type: audioBlob.type });
     
-    console.log('Transcribing audio with Whisper in:', languageConfig.name);
+    console.log('Transcribing audio with GPT-4o-mini-transcribe in:', languageConfig.name);
     
     const transcription = await client.audio.transcriptions.create({
       file: audioFile,
-      model: 'whisper-1',
-      language: languageCode === 'zh' ? 'zh' : 'ms',
-      prompt: languageCode === 'zh' ? 'Transcribe using only Simplified Chinese characters (简体中文). Do not use Traditional Chinese characters (繁體中文). Examples: 你好, 感冒, 喝水, 休息.' : 'Use standard Bahasa Melayu.',
+      model: 'gpt-4o-mini-transcribe',
+      prompt: languageCode === 'zh' ? 'Transcribe using only Simplified Chinese characters (简体中文). Do not use Traditional Chinese characters (繁體中文). Medical conversation about patient symptoms and treatment. Examples: 你好, 感冒, 喝水, 休息, 血压, 运动.' : 'Medical conversation in standard Bahasa Melayu about patient symptoms and treatment.',
       response_format: 'text'
     });
     
