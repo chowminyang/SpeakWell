@@ -64,11 +64,6 @@ export default function UserInput({
               onSpeechTranslationChange(translation);
             }
             
-            toast({
-              title: "Audio Transcribed",
-              description: "Your speech has been converted to text using OpenAI Whisper.",
-            });
-            
           } catch (error) {
             toast({
               title: "Transcription Error",
