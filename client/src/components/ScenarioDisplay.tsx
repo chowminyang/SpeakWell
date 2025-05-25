@@ -1,12 +1,15 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { ClipboardList } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ClipboardList, Globe } from 'lucide-react';
 import { Scenario } from '../types';
 
 interface ScenarioDisplayProps {
   scenario: Scenario;
+  onTryAnother?: () => void;
+  disabled?: boolean;
 }
 
-export default function ScenarioDisplay({ scenario }: ScenarioDisplayProps) {
+export default function ScenarioDisplay({ scenario, onTryAnother, disabled }: ScenarioDisplayProps) {
   return (
     <Card className="mb-8">
       <CardContent className="p-6">
@@ -18,10 +21,30 @@ export default function ScenarioDisplay({ scenario }: ScenarioDisplayProps) {
             <h3 className="text-lg font-semibold text-slate-800 mb-2">
               Current Scenario
             </h3>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <p className="text-slate-700 leading-relaxed">
                 {scenario.englishText}
               </p>
+            </div>
+            
+            {/* Try Another Scenario Button */}
+            {onTryAnother && (
+              <div className="flex justify-center mb-4">
+                <Button
+                  variant="outline"
+                  onClick={onTryAnother}
+                  disabled={disabled}
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  Try Another Scenario
+                </Button>
+              </div>
+            )}
+            
+            {/* Copyright Notice */}
+            <div className="text-center text-xs text-slate-400 mt-2">
+              © Chow Minyang, 2025. Powered by OpenAI
             </div>
           </div>
         </div>
