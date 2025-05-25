@@ -85,8 +85,24 @@ export default function FeedbackDisplay({
         });
       };
       
+      // Ensure audio is loaded before playing to prevent cutoff
+      audio.oncanplaythrough = async () => {
+        try {
+          await audio.play();
+        } catch (error) {
+          setIsPlaying(false);
+          setCurrentAudio(null);
+          URL.revokeObjectURL(audioUrl);
+          toast({
+            title: "Audio Error",
+            description: "Failed to play audio.",
+            variant: "destructive",
+          });
+        }
+      };
+      
       setCurrentAudio(audio);
-      await audio.play();
+      audio.load(); // Force load the audio
       
     } catch (error) {
       setIsPlaying(false);
