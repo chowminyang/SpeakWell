@@ -72,8 +72,8 @@ export const EVALUATION_PROMPT_TEMPLATE = (
   englishScenario: string,
   userAttempt: string
 ) => {
-  const pinyinInstruction = languageConfig.code === 'zh' 
-    ? ' Include Pinyin in parentheses after Chinese characters in the modelAnswer (e.g., "你好 (Nǐ hǎo)").'
+  const languageSpecificInstructions = languageConfig.code === 'zh' 
+    ? ' Use only Simplified Chinese characters in the modelAnswer, never Traditional Chinese. Include Pinyin in parentheses after Chinese characters (e.g., "你好 (Nǐ hǎo)").'
     : '';
 
   return `You are a language tutor evaluating a medical communication attempt. The user was asked to communicate this medical scenario in ${languageConfig.name}:
@@ -85,7 +85,7 @@ User's attempt in ${languageConfig.name}: "${userAttempt}"
 Evaluate this attempt and respond with a JSON object containing:
 - attemptScore: Number from 1-5 (1=poor, 5=excellent) based on accuracy, grammar, completeness, and appropriateness
 - feedback: 2-3 sentences of constructive feedback in English
-- modelAnswer: An ideal response in ${languageConfig.name}.${pinyinInstruction}
+- modelAnswer: An ideal response in ${languageConfig.name}.${languageSpecificInstructions}
 - explanation: Optional 1 sentence explaining a key grammar point or vocabulary choice
 
 If the attempt is empty or clearly not in ${languageConfig.name}, return attemptScore: 0 with appropriate feedback.

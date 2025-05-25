@@ -188,6 +188,7 @@ export async function transcribeAudioWithOpenAI(
       file: audioFile,
       model: 'whisper-1',
       language: languageCode === 'zh' ? 'zh' : 'ms',
+      prompt: languageCode === 'zh' ? 'Use Simplified Chinese characters only, no Traditional Chinese.' : 'Use standard Bahasa Melayu.',
       response_format: 'text'
     });
     

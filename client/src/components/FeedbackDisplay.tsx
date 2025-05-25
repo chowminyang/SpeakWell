@@ -61,22 +61,32 @@ export default function FeedbackDisplay({
     }
 
     try {
-      const utterance = new SpeechSynthesisUtterance(evaluationResult.modelAnswer);
+      // For Chinese, remove Pinyin in parentheses for TTS
+      let textToSpeak = evaluationResult.modelAnswer;
+      if (selectedLanguage === 'zh') {
+        // Remove Pinyin in parentheses like (Nǐ hǎo)
+        textToSpeak = textToSpeak.replace(/\s*\([^)]*\)/g, '');
+      }
+      
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = languageConfig.ttsCode;
       utterance.rate = 0.8;
       
-      utterance.onstart = () => setIsPlaying(true);
-      utterance.onend = () => setIsPlaying(false);
-      utterance.onerror = () => {
-        setIsPlaying(false);
-        toast({
-          title: "TTS Error",
-          description: "Failed to play text-to-speech. Voice might not be available for this language.",
-          variant: "destructive",
-        });
-      };
+      // Add a small delay to prevent audio cutoff
+      setTimeout(() => {
+        utterance.onstart = () => setIsPlaying(true);
+        utterance.onend = () => setIsPlaying(false);
+        utterance.onerror = () => {
+          setIsPlaying(false);
+          toast({
+            title: "TTS Error",
+            description: "Failed to play text-to-speech. Voice might not be available for this language.",
+            variant: "destructive",
+          });
+        };
 
-      speechSynthesis.speak(utterance);
+        speechSynthesis.speak(utterance);
+      }, 100);
     } catch (error) {
       setIsPlaying(false);
       toast({
