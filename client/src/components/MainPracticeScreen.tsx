@@ -198,10 +198,10 @@ export default function MainPracticeScreen({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
             <div className="flex items-center">
@@ -339,6 +339,15 @@ export default function MainPracticeScreen({
           />
         )}
       </main>
+      
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-xs sm:text-sm text-slate-500">
+            © Chow Minyang, 2025. Powered by OpenAI
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

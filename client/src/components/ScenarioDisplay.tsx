@@ -29,23 +29,18 @@ export default function ScenarioDisplay({ scenario, onTryAnother, disabled }: Sc
             
             {/* Try Another Scenario Button */}
             {onTryAnother && (
-              <div className="flex justify-center mb-4">
+              <div className="text-center">
                 <Button
                   variant="outline"
                   onClick={onTryAnother}
                   disabled={disabled}
-                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50 w-full sm:w-auto"
                 >
                   <Globe className="w-4 h-4 mr-2" />
                   Try Another Scenario
                 </Button>
               </div>
             )}
-            
-            {/* Copyright Notice */}
-            <div className="text-center text-xs text-slate-400 mt-2">
-              © Chow Minyang, 2025. Powered by OpenAI
-            </div>
           </div>
         </div>
       </CardContent>
