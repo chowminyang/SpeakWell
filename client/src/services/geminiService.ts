@@ -15,36 +15,43 @@ import {
 } from '../constants';
 
 // API Key handling
-function getApiKey(): string {
-  // Try multiple sources for the API key
-  const apiKey = (window as any).process?.env?.VITE_GEMINI_API_KEY ||
-                 import.meta.env.VITE_GEMINI_API_KEY ||
-                 (window as any).process?.env?.GEMINI_API_KEY ||
-                 (window as any).process?.env?.API_KEY ||
-                 import.meta.env.VITE_API_KEY;
+async function getApiKey(): Promise<string> {
+  // First try URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlApiKey = urlParams.get('API_KEY') || urlParams.get('GEMINI_API_KEY');
   
-  console.log('Available environment variables:', {
-    vite_gemini_api_key: import.meta.env.VITE_GEMINI_API_KEY,
-    process_vite_gemini_api_key: (window as any).process?.env?.VITE_GEMINI_API_KEY,
-    process_gemini_api_key: (window as any).process?.env?.GEMINI_API_KEY,
-    process_api_key: (window as any).process?.env?.API_KEY,
-    final_api_key: apiKey,
-    has_api_key: !!apiKey
-  });
-  
-  if (!apiKey || apiKey === 'your-api-key-here' || apiKey === 'placeholder' || apiKey === '{{GEMINI_API_KEY}}') {
-    throw new Error('Gemini API key is missing. Please provide a valid API key.');
+  if (urlApiKey) {
+    return urlApiKey;
   }
   
-  return apiKey;
+  // Then try to fetch from server
+  try {
+    const response = await fetch('/api/config');
+    const config = await response.json();
+    if (config.geminiApiKey) {
+      return config.geminiApiKey;
+    }
+  } catch (error) {
+    console.log('Could not fetch API key from server');
+  }
+  
+  // Try process.env as fallback
+  const processApiKey = (window as any).process?.env?.GEMINI_API_KEY ||
+                       (window as any).process?.env?.API_KEY;
+  
+  if (processApiKey && processApiKey !== '{{GEMINI_API_KEY}}') {
+    return processApiKey;
+  }
+  
+  throw new Error('Gemini API key is missing. Please provide a valid API key.');
 }
 
 // Initialize Gemini AI
 let genAI: GoogleGenerativeAI;
 
-function initializeGenAI() {
+async function initializeGenAI() {
   if (!genAI) {
-    const apiKey = getApiKey();
+    const apiKey = await getApiKey();
     genAI = new GoogleGenerativeAI(apiKey);
   }
   return genAI;
@@ -69,7 +76,7 @@ export async function generateNewScenario(
   previousScenarios: string[] = []
 ): Promise<Scenario> {
   try {
-    const ai = initializeGenAI();
+    const ai = await initializeGenAI();
     const model = ai.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
     
     const languageConfig = LANGUAGE_CONFIG[languageCode];
@@ -104,7 +111,7 @@ export async function evaluateAndSuggest(
   userAttempt: string
 ): Promise<AIParsedResponse> {
   try {
-    const ai = initializeGenAI();
+    const ai = await initializeGenAI();
     const model = ai.getGenerativeModel({ 
       model: GEMINI_TEXT_MODEL,
       generationConfig: {
@@ -147,7 +154,7 @@ export async function translateTextToEnglish(
   textToTranslate: string
 ): Promise<string> {
   try {
-    const ai = initializeGenAI();
+    const ai = await initializeGenAI();
     const model = ai.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
     
     const languageConfig = LANGUAGE_CONFIG[languageCode];
@@ -180,7 +187,7 @@ export async function transcribeAudioWithGemini(
       audioDataLength: base64Audio?.length || 0
     });
     
-    const ai = initializeGenAI();
+    const ai = await initializeGenAI();
     const model = ai.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
     
     const languageConfig = LANGUAGE_CONFIG[languageCode];
