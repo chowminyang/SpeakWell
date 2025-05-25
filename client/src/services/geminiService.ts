@@ -25,8 +25,10 @@ function getApiKey(): string {
   
   console.log('Available environment variables:', {
     vite_gemini_api_key: import.meta.env.VITE_GEMINI_API_KEY,
+    process_vite_gemini_api_key: (window as any).process?.env?.VITE_GEMINI_API_KEY,
     process_gemini_api_key: (window as any).process?.env?.GEMINI_API_KEY,
     process_api_key: (window as any).process?.env?.API_KEY,
+    final_api_key: apiKey,
     has_api_key: !!apiKey
   });
   
