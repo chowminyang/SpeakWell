@@ -188,7 +188,7 @@ export async function transcribeAudioWithOpenAI(
       file: audioFile,
       model: 'whisper-1',
       language: languageCode === 'zh' ? 'zh' : 'ms',
-      prompt: languageCode === 'zh' ? 'Use Simplified Chinese characters only, no Traditional Chinese.' : 'Use standard Bahasa Melayu.',
+      prompt: languageCode === 'zh' ? 'Transcribe using only Simplified Chinese characters (简体中文). Do not use Traditional Chinese characters (繁體中文). Examples: 你好, 感冒, 喝水, 休息.' : 'Use standard Bahasa Melayu.',
       response_format: 'text'
     });
     
